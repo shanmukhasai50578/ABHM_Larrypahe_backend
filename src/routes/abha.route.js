@@ -1,12 +1,11 @@
-import { v4 as uuidv4 } from 'uuid';
-import { Router } from 'express';
+const express = require('express');
 const abhaContoller = require('../controllers/abhaController')
 
-const router = Router();
+const router = express.Router();
 
-router.get('/', (req, res) => {
-  return res.json("ABHA");
-});
+// router.get('/', (req, res) => {
+//     return res.json("ABHA");
+// });
 
 router.post('/address/generateOTP', abhaContoller.generateOTP)
 
@@ -16,6 +15,4 @@ router.post('/address/registrationDetails', abhaContoller.addressRegistrationDet
 
 router.post('/address/createPhrAddress', abhaContoller.addressCreatePhr)
 
-
-
-export default router;
+module.exports = router;

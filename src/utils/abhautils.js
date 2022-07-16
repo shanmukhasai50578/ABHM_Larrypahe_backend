@@ -1,4 +1,4 @@
-import 'dotenv/config';
+require('dotenv').config();
 const axios = require('axios');
 const crypto = require('crypto')
 const boom = require('@hapi/boom');

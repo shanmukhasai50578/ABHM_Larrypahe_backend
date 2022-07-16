@@ -1,8 +1,8 @@
-import 'dotenv/config';
-import cors from 'cors';
-import express from 'express';
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors')
 
-import routes from './routes';
+// const routes = 
 
 const app = express();
 
@@ -20,7 +20,8 @@ app.use((data, _req, res, _next) => {
 });
 
 
-app.use('/abha', routes.abha);
+app.use('/abha', require('./routes'));
+
 
 app.use('*', (req, res) =>
   res.status(StatusCodes.NOT_FOUND).json({

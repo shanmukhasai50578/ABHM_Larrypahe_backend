@@ -1,4 +1,4 @@
-import 'dotenv/config';
+require('dotenv').config();
 const abhaUtils = require('../utils/abhautils')
 const axios = require('axios');
 const _ = require('lodash');
