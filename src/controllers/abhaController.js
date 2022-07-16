@@ -1,5 +1,7 @@
+const _ = require('lodash')
 const abhaServices = require('../services/abhaServices')
-const errorDecorator = require('../middleware/validation')
+const errorDecorator = require('../middleware/validation');
+
 
 const generateOTP = errorDecorator(async (req, res) => {
     const retValue = await abhaServices.generateAddressOtp(
@@ -31,15 +33,17 @@ const addressCreatePhr = errorDecorator(async (req, res) => {
         req.body.sessionId,
         req.body.alreadyExistedPHR,
     );
+    const token = JSON.parse(retValue.data).token;
+    let getProfile = await abhaServices.getProfile(token)
+    retValue.profile = JSON.parse(getProfile.data);
     retValue.data = JSON.parse(retValue.data);
+
     res.send(retValue);
 });
-
 
 module.exports = {
     generateOTP,
     validateAddressOtp,
     addressRegistrationDetails,
-    addressCreatePhr
-
+    addressCreatePhr,
 }

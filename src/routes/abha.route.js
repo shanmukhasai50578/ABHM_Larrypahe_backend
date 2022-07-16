@@ -3,9 +3,6 @@ const abhaContoller = require('../controllers/abhaController')
 
 const router = express.Router();
 
-// router.get('/', (req, res) => {
-//     return res.json("ABHA");
-// });
 
 router.post('/address/generateOTP', abhaContoller.generateOTP)
 

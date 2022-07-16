@@ -17,7 +17,6 @@ const encryptRSA = async (mobile) => {
 
 
 const axiosRequest = async (config) => {
-    // console.log(config)
     const result = axios(config)
         .then((response) => {
             return {

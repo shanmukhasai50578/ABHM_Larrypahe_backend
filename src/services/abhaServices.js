@@ -2,7 +2,13 @@ require('dotenv').config();
 const abhaUtils = require('../utils/abhautils')
 const axios = require('axios');
 const _ = require('lodash');
+const S3 = require('aws-sdk/clients/s3')
+const fs = require('fs');
+const AWS = require('aws-sdk')
+const base64ToImage = require('base64-to-image')
 const mapping = require('../utils/mapping')
+const { v4: uuidv4 } = require('uuid');
+const boom = require('@hapi/boom');
 
 const generateAddressOtp = async (mobile) => {
     let value = await abhaUtils.encryptRSA(mobile);
@@ -89,10 +95,76 @@ const addressCreatePhr = async (
     return response;
 };
 
+const s3 = new AWS.S3({
+    accessKeyId: process.env.AWSAccessKeyId,
+    secretAccessKey: process.env.AWSSecretKey,
+})
+
+
+const fetchCard = async (token, abha) => {
+    try {
+        const params = {
+            method: 'get',
+            url: `${process.env.NDHM_PHR_URL}/v1/apps/patients/profile/qr-code`,
+            headers: {
+                'X-Auth-Token': token,
+            },
+            responseType: 'arraybuffer',
+        };
+        const response = await abhaUtils.axiosRequest(params);
+        let base64ImageString = Buffer.from(response.data, 'binary').toString('base64')
+
+        const filedata = base64ImageString;
+        let matches = filedata.match(/^(.+)$/);
+        let filebuffer = new Buffer.from(matches[0], 'base64');
+        filebuffer = filebuffer.toString('base64')
+
+        const uploadedImage = await s3.upload({
+            Bucket: process.env.AWSBucketName,
+            Key: "abha",
+            Body: filebuffer,
+            ContentEncoding: "base64",
+            ContentType: "Image/png"
+        }).promise()
+
+        console.log(uploadedImage.Location)
+
+
+        // let store = { 'fileName': `${abha}`, 'type': 'png' }
+        // let imageData = base64ToImage(response, '../utils/images', store)
+
+        // S3Client.upload({ Body: data })
+        //     .then(data => console.log(data))
+        //     .catch(err => console.error(err))
+        return [];
+    } catch (error) {
+        if (error?.response?.data?.error?.code === 1401) {
+            logger.error((`ERROR WHILE CALLING NDHM API : ${error?.response?.data?.error?.message}`));
+            throw boom.unauthorized(`${error?.response?.data?.error?.message}`);
+        }
+        throw boom.badRequest(error.message)
+    }
+}
+
+const getProfile = async (token) => {
+    const params = {
+        method: 'get',
+        url: `${process.env.NDHM_PHR_URL}/patients/me`,
+        headers: {
+            'X-Auth-Token': token,
+        },
+    };
+
+    let result = await abhaUtils.axiosRequest(params)
+    return result;
+}
+
 module.exports = {
     generateAddressOtp,
     validateAddressOtp,
     addressRegistrationDetails,
-    addressCreatePhr
+    addressCreatePhr,
+    fetchCard,
+    getProfile
 
 }
