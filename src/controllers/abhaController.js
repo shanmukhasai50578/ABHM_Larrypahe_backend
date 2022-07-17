@@ -34,10 +34,12 @@ const addressCreatePhr = errorDecorator(async (req, res) => {
         req.body.alreadyExistedPHR,
     );
     const token = JSON.parse(retValue.data).token;
+
+    let imageData = await abhaServices.fetchCard(token, req.body.phrAddress);
+    retValue.imageData = imageData;
+    retValue.data = JSON.parse(retValue.data);
     let getProfile = await abhaServices.getProfile(token)
     retValue.profile = JSON.parse(getProfile.data);
-    retValue.data = JSON.parse(retValue.data);
-
     res.send(retValue);
 });
 

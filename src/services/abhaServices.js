@@ -112,22 +112,22 @@ const fetchCard = async (token, abha) => {
             responseType: 'arraybuffer',
         };
         const response = await abhaUtils.axiosRequest(params);
-        let base64ImageString = Buffer.from(response.data, 'binary').toString('base64')
+        // let base64ImageString = Buffer.from(response.data, 'binary').toString('base64')
 
-        const filedata = base64ImageString;
-        let matches = filedata.match(/^(.+)$/);
-        let filebuffer = new Buffer.from(matches[0], 'base64');
-        filebuffer = filebuffer.toString('base64')
+        // const filedata = base64ImageString;
+        // let matches = filedata.match(/^(.+)$/);
+        // let filebuffer = new Buffer.from(matches[0], 'base64');
+        // filebuffer = filebuffer.toString('base64')
 
-        const uploadedImage = await s3.upload({
-            Bucket: process.env.AWSBucketName,
-            Key: "abha",
-            Body: filebuffer,
-            ContentEncoding: "base64",
-            ContentType: "Image/png"
-        }).promise()
+        // const uploadedImage = await s3.upload({
+        //     Bucket: process.env.AWSBucketName,
+        //     Key: "abha",
+        //     Body: filebuffer,
+        //     ContentEncoding: "base64",
+        //     ContentType: "Image/png"
+        // }).promise()
 
-        console.log(uploadedImage.Location)
+        // console.log(uploadedImage.Location)
 
 
         // let store = { 'fileName': `${abha}`, 'type': 'png' }
@@ -136,7 +136,7 @@ const fetchCard = async (token, abha) => {
         // S3Client.upload({ Body: data })
         //     .then(data => console.log(data))
         //     .catch(err => console.error(err))
-        return [];
+        return response.data;
     } catch (error) {
         if (error?.response?.data?.error?.code === 1401) {
             logger.error((`ERROR WHILE CALLING NDHM API : ${error?.response?.data?.error?.message}`));
